@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Vista Aeropuerto - CD Lurín</title>
+
+    <style>
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+
+            width: 100%;
+            height: 100%;
+
+            overflow: hidden;
+
+            background: #000;
+        }
+
+
+        #powerbi {
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            border: none;
+        }
+
+
+        #estado {
+            position: fixed;
+
+            right: 15px;
+            bottom: 12px;
+
+            padding: 8px 14px;
+
+            background: rgba(0, 0, 0, 0.78);
+
+            color: white;
+
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+
+            border-radius: 8px;
+
+            z-index: 99999;
+        }
+
+
+        .online {
+            color: #55dd55;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ===================================================
+         POWER BI
+         =================================================== -->
+
+    <iframe
+
+        id="powerbi"
+
+        src="https://app.powerbi.com/view?r=eyJrIjoiYWM1NDhhYjUtZDYxZS00YTg4LWE4ZTQtODkxMGFhNWZhZTk3IiwidCI6IjMyZTAxNzYzLTQxZTItNDA5My1hZWQ2LTVhZjFmOWMzNzk2NSJ9"
+
+        allowfullscreen="true">
+
+    </iframe>
+
+
+    <!-- ===================================================
+         ESTADO
+         =================================================== -->
+
+    <div id="estado">
+
+        <span class="online">
+            ● ONLINE
+        </span>
+
+        |
+
+        Iniciando...
+
+    </div>
+
+
+<script>
+
+
+// ==========================================================
+// POWER BI
+// ==========================================================
+
+const URL_POWER_BI =
+    "https://app.powerbi.com/view?r=eyJrIjoiYWM1NDhhYjUtZDYxZS00YTg4LWE4ZTQtODkxMGFhNWZhZTk3IiwidCI6IjMyZTAxNzYzLTQxZTItNDA5My1hZWQ2LTVhZjFmOWMzNzk2NSJ9";
+
+
+const powerbi =
+    document.getElementById("powerbi");
+
+
+const estado =
+    document.getElementById("estado");
+
+
+// ==========================================================
+// CONFIGURACIÓN
+// ==========================================================
+
+// TRUE = prueba cada 30 segundos
+// FALSE = horarios oficiales
+
+const MODO_PRUEBA = true;
+
+
+const SEGUNDOS_PRUEBA = 30;
+
+
+// ==========================================================
+// HORARIOS OFICIALES
+// LIMA - PERÚ
+// ==========================================================
+
+const HORARIOS = [
+
+    "00:00",
+    "06:00",
+    "09:00",
+    "12:00",
+    "15:00",
+    "18:00",
+    "21:00"
+
+];
+
+
+let ultimaEjecucion = "";
+
+
+// ==========================================================
+// OBTENER HORA DE LIMA
+// ==========================================================
+
+function obtenerHoraLima() {
+
+    const partes =
+
+        new Intl.DateTimeFormat(
+
+            "en-GB",
+
+            {
+                timeZone: "America/Lima",
+
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+
+                hour12: false
+            }
+
+        ).formatToParts(
+            new Date()
+        );
+
+
+    const datos = {};
+
+
+    partes.forEach(
+
+        function(parte) {
+
+            datos[parte.type] =
+                parte.value;
+
+        }
+
+    );
+
+
+    return {
+
+        fecha:
+            datos.day +
+            "/" +
+            datos.month +
+            "/" +
+            datos.year,
+
+        hora:
+            datos.hour +
+            ":" +
+            datos.minute,
+
+        horaCompleta:
+            datos.hour +
+            ":" +
+            datos.minute +
+            ":" +
+            datos.second
+
+    };
+
+}
+
+
+// ==========================================================
+// ACTUALIZAR POWER BI
+// ==========================================================
+
+function actualizarPowerBI() {
+
+    const lima =
+        obtenerHoraLima();
+
+
+    estado.innerHTML =
+
+        '<span class="online">● ONLINE</span>' +
+
+        ' | Actualizando: ' +
+
+        lima.horaCompleta;
+
+
+    console.log(
+        "Actualizando Power BI:",
+        lima.fecha,
+        lima.horaCompleta
+    );
+
+
+    // ------------------------------------------------------
+    // Agregamos un identificador único a la URL.
+    //
+    // Esto obliga al navegador a solicitar nuevamente
+    // el contenido de Power BI.
+    //
+    // NO abre otra pestaña.
+    // ------------------------------------------------------
+
+    powerbi.src =
+
+        URL_POWER_BI +
+
+        "&tv_refresh=" +
+
+        Date.now();
+
+
+    setTimeout(
+
+        function() {
+
+            estado.innerHTML =
+
+                '<span class="online">● ONLINE</span>' +
+
+                ' | Última actualización: ' +
+
+                lima.fecha +
+
+                ' ' +
+
+                lima.horaCompleta;
+
+        },
+
+        5000
+
+    );
+
+}
+
+
+// ==========================================================
+// MODO PRUEBA
+// ==========================================================
+
+function iniciarPrueba() {
+
+    estado.innerHTML =
+
+        '<span class="online">● ONLINE</span>' +
+
+        ' | PRUEBA: actualización cada ' +
+
+        SEGUNDOS_PRUEBA +
+
+        ' segundos';
+
+
+    setInterval(
+
+        actualizarPowerBI,
+
+        SEGUNDOS_PRUEBA * 1000
+
+    );
+
+}
+
+
+// ==========================================================
+// MODO PRODUCCIÓN
+// ==========================================================
+
+function iniciarProduccion() {
+
+    estado.innerHTML =
+
+        '<span class="online">● ONLINE</span>' +
+
+        ' | Actualización automática activa';
+
+
+    setInterval(
+
+        function() {
+
+            const lima =
+                obtenerHoraLima();
+
+
+            const identificador =
+
+                lima.fecha +
+
+                " " +
+
+                lima.hora;
+
+
+            if (
+                HORARIOS.includes(
+                    lima.hora
+                )
+            ) {
+
+                if (
+                    ultimaEjecucion !==
+                    identificador
+                ) {
+
+                    ultimaEjecucion =
+                        identificador;
+
+
+                    actualizarPowerBI();
+
+                }
+
+            }
+
+        },
+
+        5000
+
+    );
+
+}
+
+
+// ==========================================================
+// INICIAR
+// ==========================================================
+
+if (MODO_PRUEBA) {
+
+    iniciarPrueba();
+
+}
+
+else {
+
+    iniciarProduccion();
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

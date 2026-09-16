@@ -130,9 +130,6 @@ const estado =
 // CONFIGURACIÓN
 // ==========================================================
 
-// TRUE = prueba cada 30 segundos
-// FALSE = horarios oficiales
-
 // ================================================
 // CONFIGURACIÓN DE ACTUALIZACIÓN AUTOMÁTICA
 // ================================================
@@ -141,8 +138,6 @@ const estado =
 // cada cuántos minutos se actualiza Power BI.
 
 const INTERVALO_MINUTOS = 2;
-
-let ultimaEjecucion = "";
 
 
 // ==========================================================
@@ -261,33 +256,29 @@ function actualizarPowerBI() {
         Date.now();
 
 
-    setTimeout(
+setTimeout(
 
-        function() {
+    function() {
 
-            estado.innerHTML =
+        estado.innerHTML =
+            '<span class="online">● ONLINE</span>' +
+            ' | Cada ' + INTERVALO_MINUTOS + ' min' +
+            ' | Última actualización: ' +
+            lima.fecha +
+            ' ' +
+            lima.horaCompleta;
 
-                '<span class="online">● ONLINE</span>' +
+    },
 
-                ' | Última actualización: ' +
+    5000
 
-                lima.fecha +
-
-                ' ' +
-
-                lima.horaCompleta;
-
-        },
-
-        5000
-
-    );
+);
 
 }
 
 
 // ==========================================================
-// MODO PRUEBA
+// ACTUALIZACIÓN AUTOMÁTICA
 // ==========================================================
 
 function iniciarActualizacionAutomatica() {

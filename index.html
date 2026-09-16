@@ -263,10 +263,11 @@ setTimeout(
         estado.innerHTML =
             '<span class="online">● ONLINE</span>' +
             ' | Cada ' + INTERVALO_MINUTOS + ' min' +
-            ' | Última actualización: ' +
+            ' | Última actualización de navegador : ' +
             lima.fecha +
             ' ' +
             lima.horaCompleta;
+    
 
     },
 
@@ -285,7 +286,7 @@ function iniciarActualizacionAutomatica() {
 
     estado.innerHTML =
         '<span class="online">● ONLINE</span>' +
-        ' | Actualización cada ' +
+        ' | Actualización del navegador cada ' +
         INTERVALO_MINUTOS +
         ' minutos';
 

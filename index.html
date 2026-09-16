@@ -133,29 +133,14 @@ const estado =
 // TRUE = prueba cada 30 segundos
 // FALSE = horarios oficiales
 
-const MODO_PRUEBA = false;
+// ================================================
+// CONFIGURACIÓN DE ACTUALIZACIÓN AUTOMÁTICA
+// ================================================
 
+// Cambia SOLO este número para modificar
+// cada cuántos minutos se actualiza Power BI.
 
-const SEGUNDOS_PRUEBA = 30;
-
-
-// ==========================================================
-// HORARIOS OFICIALES
-// LIMA - PERÚ
-// ==========================================================
-
-const HORARIOS = [
-
-    "00:00",
-    "06:00",
-    "09:00",
-    "12:00",
-    "15:00",
-    "18:00",
-    "21:00"
-
-];
-
+const INTERVALO_MINUTOS = 5;
 
 let ultimaEjecucion = "";
 
@@ -305,105 +290,21 @@ function actualizarPowerBI() {
 // MODO PRUEBA
 // ==========================================================
 
-function iniciarPrueba() {
+function iniciarActualizacionAutomatica() {
 
     estado.innerHTML =
-
         '<span class="online">● ONLINE</span>' +
-
-        ' | PRUEBA: actualización cada ' +
-
-        SEGUNDOS_PRUEBA +
-
-        ' segundos';
-
+        ' | Actualización cada ' +
+        INTERVALO_MINUTOS +
+        ' minutos';
 
     setInterval(
-
         actualizarPowerBI,
-
-        SEGUNDOS_PRUEBA * 1000
-
+        INTERVALO_MINUTOS * 60 * 1000
     );
-
 }
 
-
-// ==========================================================
-// MODO PRODUCCIÓN
-// ==========================================================
-
-function iniciarProduccion() {
-
-    estado.innerHTML =
-
-        '<span class="online">● ONLINE</span>' +
-
-        ' | Actualización automática activa';
-
-
-    setInterval(
-
-        function() {
-
-            const lima =
-                obtenerHoraLima();
-
-
-            const identificador =
-
-                lima.fecha +
-
-                " " +
-
-                lima.hora;
-
-
-            if (
-                HORARIOS.includes(
-                    lima.hora
-                )
-            ) {
-
-                if (
-                    ultimaEjecucion !==
-                    identificador
-                ) {
-
-                    ultimaEjecucion =
-                        identificador;
-
-
-                    actualizarPowerBI();
-
-                }
-
-            }
-
-        },
-
-        5000
-
-    );
-
-}
-
-
-// ==========================================================
-// INICIAR
-// ==========================================================
-
-if (MODO_PRUEBA) {
-
-    iniciarPrueba();
-
-}
-
-else {
-
-    iniciarProduccion();
-
-}
+iniciarActualizacionAutomatica();
 
 
 </script>
